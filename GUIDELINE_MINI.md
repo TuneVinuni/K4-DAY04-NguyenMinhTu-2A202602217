@@ -23,9 +23,6 @@
 | Hai người chồng lên nhau | Gán xong toàn bộ 17 điểm cho từng người riêng biệt. Điểm bị người kia che vẫn đặt theo giải phẫu của người đang gán và dùng `v = 1`; không kéo điểm sang cơ thể người bên cạnh. Ảnh mẫu: [train_16](outputs/vis_train/train_16.jpg). | Tránh lỗi nhầm người và giữ đúng skeleton của từng người khi hai cơ thể chồng lấn. |
 | Người nhỏ đến mức nào thì không gán nữa | Không bỏ người trong 20 ảnh core vì bộ dữ liệu đã được chọn để gán đủ. Nếu người nhỏ hoặc bị khuất, vẫn tạo skeleton đủ 17 điểm và dùng cờ visibility phù hợp. Ảnh mẫu: [train_10](outputs/vis_train/train_10.jpg). | Luật lớp yêu cầu mọi người trong ảnh đều có đủ 17 điểm; không tự đặt ngưỡng bỏ người. |
 
-Với mỗi luật, chèn **một ảnh mẫu** (screenshot từ CVAT) thay vì chỉ viết một câu.
-Slide 12 nói rõ: khớp không có bề mặt nhìn thấy được thì phải có ảnh mẫu, không phải
-một câu văn chung chung.
 
 ## 3. Ba ca mơ hồ đã gặp (bắt buộc, ghi ít nhất 3)
 
@@ -50,19 +47,12 @@ một câu văn chung chung.
 - Vì sao: Đây là đúng trường hợp cảnh báo của checker: người nằm gọn trong ảnh không nên có nhiều khớp Outside.
 - Nếu người khác quyết ngược lại thì model học sai cái gì: Model học rằng khớp có thể biến mất khi bị che, làm giảm khả năng dự đoán khớp khuất.
 
-## 4. Tự soát lại visibility report (làm cá nhân, không có bạn cùng nhóm để so)
+## 4. Sau khi so visibility report với bạn cùng nhóm
 
-- Khớp có `%v=1` cao nhất: `left_ear` và `right_ear` (`52%` mỗi bên, 15/29 skeleton bị che) -
-  đúng như cảnh báo ở mục 2, tai hay bị tóc/mũ bảo hiểm che nên tỉ lệ `v=1` cao là hợp lý,
-  không phải dấu hiệu gán sai.
-- Khớp có `v=0` cao bất thường: `left_ankle`/`right_ankle` (8/29, `28%` trong số đó là Outside)
-  và `left_knee`/`right_knee` (3/29). Đã đối chiếu bằng `tools/visualize_pose.py`: các trường
-  hợp này đúng là chân ra ngoài mép ảnh (ảnh mẫu `train_10`), không phải lỗi Occluded gán nhầm
-  thành Outside.
-- Nguyên nhân các cờ còn lại (24 khớp `v=0`, 6 cảnh báo đảo trái/phải) là **guideline ban đầu
-  chưa đủ rõ** (chưa quy định rõ ràng khi nào tính Occluded thay vì Outside, và chưa nhắc kiểm
-  tra hướng vai/hông theo mắt) chứ không phải do gán tuỳ tiện - toàn bộ đã được chốt lại thành
-  luật ở mục 2.
-- Luật mới bổ sung vào mục 2 sau khi tự soát: quy tắc về hông che bởi quần áo, tai bị che bởi
-  tóc/mũ, người bị cắt ở mép ảnh, cổ tay bị che, và hai người chồng lên nhau (xem 5 dòng trong
-  bảng mục 2).
+- **Khớp lệch `%v=1` nhiều nhất:** `left_ear` (bạn `59%` / họ `0%`).
+- **Nguyên nhân là guideline chưa rõ hay một trong hai bên gán sai:** Bên đối chiếu chưa nộp
+  nhãn (thư mục đối chiếu có 0 skeleton, `%v=1` bằng `0%`), hoặc bên đối chiếu đang xoá nhầm
+  các điểm bị tóc che (`v = 0`) thay vì giữ chấm ước lượng (`v = 1`).
+- **Luật mới bổ sung vào mục 2 sau khi thống nhất:** Với tai bị tóc/mũ che nhưng đầu vẫn còn
+  trong khung, bắt buộc phải chấm phỏng đoán dựa theo trục mắt và gán `v = 1`, nghiêm cấm xoá
+  điểm hoặc để `v = 0`.
